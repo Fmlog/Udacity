@@ -2,9 +2,31 @@ import path from "path";
 import sharp from "sharp";
 import { existsSync, promises as fs } from "fs";
 
+function getFileName(fileName: string): Promise<String> {
+  return new Promise((resolve, reject) => {
+    try {
+      const exts = [".png", ".jpg", ".webp"];
+      let fullFilename = "";
+      const matches = [];
+      for (let e of exts) {
+        matches.push(path.resolve("assets/full/" + fileName + e));
+      }
+      for (let m of matches) {
+        if (existsSync(m)) {
+          fullFilename = m;
+          break;
+        }
+      }
+      resolve(fullFilename);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 async function resize(req: { query: any }, res: any, next: () => void) {
   const query = req.query;
-  const image = `assets/full/${query.filename}`;
+  const image = (await getFileName(query.filename)) as string;
   const imgExport = `assets/thumb/${query.filename}`;
 
   if (!existsSync(imgExport)) {

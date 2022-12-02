@@ -1,5 +1,5 @@
 import express from "express";
-import resize from "../resize";
+import resize from "./resize";
 
 const image = express.Router();
 
