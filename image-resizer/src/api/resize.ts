@@ -23,21 +23,29 @@ function getFileName(fileName: string): Promise<String> {
     }
   });
 }
+async function resizeHelper(
+  image: string,
+  width: number,
+  height: number,
+  imgExport: string
+) {
+  sharp(image)
+    .resize(Number(width), height)
+    .toFile(imgExport, (error, info) => {
+      console.log(`Something went wrong!\n\n ${error} ${info}`);
+    });
+}
 
 async function resize(req: { query: any }, res: any, next: () => void) {
-  const query = req.query;
-  const image = (await getFileName(query.filename)) as string;
-  const imgExport = `assets/thumb/${query.filename}`;
+  const query = await req.query;
+  const filename = query.filename;
+  const image = (await getFileName(filename)) as string;
+  const imgExport = `assets/thumb/${filename}.jpg`;
+  const width = Number(query.width);
+  const height = Number(query.height);
 
   if (!existsSync(imgExport)) {
-    await fs.writeFile(
-      imgExport,
-      sharp(image)
-        .resize(Number(query.width), Number(query.height))
-        .toFile(imgExport, (error, info) => {
-          console.log(`Something went wrong!\n\n ${error} ${info}`);
-        })
-    );
+    await resizeHelper(image, width, height, imgExport);
   }
 
   try {
