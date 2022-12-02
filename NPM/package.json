@@ -1,0 +1,20 @@
+{
+  "name": "npm",
+  "version": "1.0.0",
+  "description": "Playing with npm projects",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettier": "prettier --config .prettierrc 'src/**/*.js' --write",
+    "lint": "eslint 'src/**/*.js'"
+  },
+  "author": "femi",
+  "license": "ISC",
+  "devDependencies": {
+    "prettier": "^2.7.1"
+  },
+  "dependencies": {
+    "axios": "^1.1.3"
+  }
+}
