@@ -1,59 +1,46 @@
 import path from "path";
 import sharp from "sharp";
-import { existsSync, promises as fs } from "fs";
+import express from "express";
+import { existsSync } from "fs";
 
-function getFileName(fileName: string): Promise<String> {
-  return new Promise((resolve, reject) => {
-    try {
-      const exts = [".png", ".jpg", ".webp"];
-      let fullFilename = "";
-      const matches = [];
-      for (let e of exts) {
-        matches.push(path.resolve("assets/full/" + fileName + e));
-      }
-      for (let m of matches) {
-        if (existsSync(m)) {
-          fullFilename = m;
-          break;
-        }
-      }
-      resolve(fullFilename);
-    } catch (error) {
-      reject(error);
-    }
-  });
-}
-async function resizeHelper(
-  image: string,
-  width: number,
-  height: number,
-  imgExport: string
-) {
-  sharp(image)
-    .resize(Number(width), height)
-    .toFile(imgExport, (error, info) => {
-      console.log(`Something went wrong!\n\n ${error} ${info}`);
-    });
-}
-
-async function resize(req: { query: any }, res: any, next: () => void) {
-  const query = await req.query;
-  const filename = query.filename;
-  const image = (await getFileName(filename)) as string;
-  const imgExport = `assets/thumb/${filename}.jpg`;
-  const width = Number(query.width);
-  const height = Number(query.height);
-
-  if (!existsSync(imgExport)) {
-    await resizeHelper(image, width, height, imgExport);
+function getFilePath(fileName: string): string {
+  const exts = [".png", ".jpg", ".webp"];
+  let fullFilename = "";
+  const matches = [];
+  for (const e of exts) {
+    matches.push(path.resolve("assets/full/" + fileName + e));
   }
+  for (const m of matches) {
+    if (existsSync(m)) {
+      fullFilename = m;
+      break;
+    }
+  }
+  return fullFilename;
+}
+
+async function resize(
+  req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+) {
+  console.log(req.query);
+  const query = req.query;
+  const filename = query.filename as string;
+  const image = getFilePath(filename);
+  const height = Number(query.height);
+  const width = Number(query.width);
 
   try {
-    res.sendFile(path.resolve(imgExport));
+    if (!existsSync(`assets/thumb/${filename}.jpg`)) {
+      await sharp(image)
+        .resize(width, height)
+        .toFormat("jpg")
+        .toFile(`assets/thumb/${filename}.jpg`);
+    }
   } catch (error) {
-    res.status(404).send("Image does not exist");
+    console.log(error);
   }
-
   next();
 }
 
