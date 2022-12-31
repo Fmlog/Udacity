@@ -14,7 +14,7 @@ image.get("/api", resize_1.default, function (req, res) {
         res.status(200).sendFile(path_1.default.resolve(imgExport));
     }
     catch (error) {
-        res.status(404).send("Image does not exist, please check query");
+        res.status(404).send("Image query error, please check query");
     }
 });
 exports.default = image;

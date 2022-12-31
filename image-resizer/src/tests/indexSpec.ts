@@ -14,32 +14,24 @@ describe("Tests for the endpoint", (): void => {
 });
 
 describe("Tests for the resize middleware", (): void => {
-  describe("missing width from query", (): void => {
+  describe("Tests incomplete query", (): void => {
     let response: supertest.Response;
     beforeEach(async (): Promise<void> => {
-      response = await request.get("/api/images?filename=fjord");
+      response = await request.get("/api/?filename=femi");
     });
 
-    it("GET /api/images with missing width produces 400 status code", (): void => {
-      expect(response.status).toEqual(400);
-      expect(response.text).toEqual(
-        "Please append '&width=<WIDTH>' to the URL. Example: &width=500"
-      );
-    });
-
-    it("GET /api/images with missing width produces a helpful error", (): void => {
-      expect(response.text).toEqual(
-        "Please append '&width=<WIDTH>' to the URL. Example: &width=500"
-      );
+    it("GET /api with missing width produces 400 status code", (): void => {
+      expect(response.status).toEqual(404);
+      expect(response.text).toEqual("Image query error, please check query");
     });
 
     it("expects image file to be written", async (): Promise<void> => {
       const response = await request.get(
-        "/api/images?filename=femi&width=200&height=200"
+        "/api?filename=femi&width=200&height=200"
       );
       const imgExport = "assets/thumb/femi.jpg";
 
-      //expect(response.status).toEqual(200);
+      expect(response.status).toEqual(200);
       expect(existsSync(imgExport)).toBeTrue();
     });
   });

@@ -60,34 +60,31 @@ describe("Tests for the endpoint", function () {
     });
 });
 describe("Tests for the resize middleware", function () {
-    describe("missing width from query", function () {
+    describe("Tests incomplete query", function () {
         var response;
         beforeEach(function () { return __awaiter(void 0, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.get("/api/images?filename=fjord")];
+                    case 0: return [4 /*yield*/, request.get("/api/?filename=femi")];
                     case 1:
                         response = _a.sent();
                         return [2 /*return*/];
                 }
             });
         }); });
-        it("GET /api/images with missing width produces 400 status code", function () {
-            expect(response.status).toEqual(400);
-            expect(response.text).toEqual("Please append '&width=<WIDTH>' to the URL. Example: &width=500");
-        });
-        it("GET /api/images with missing width produces a helpful error", function () {
-            expect(response.text).toEqual("Please append '&width=<WIDTH>' to the URL. Example: &width=500");
+        it("GET /api with missing width produces 400 status code", function () {
+            expect(response.status).toEqual(404);
+            expect(response.text).toEqual("Image query error, please check query");
         });
         it("expects image file to be written", function () { return __awaiter(void 0, void 0, void 0, function () {
             var response, imgExport;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, request.get("/api/images?filename=femi&width=200&height=200")];
+                    case 0: return [4 /*yield*/, request.get("/api?filename=femi&width=200&height=200")];
                     case 1:
                         response = _a.sent();
                         imgExport = "assets/thumb/femi.jpg";
-                        //expect(response.status).toEqual(200);
+                        expect(response.status).toEqual(200);
                         expect((0, fs_1.existsSync)(imgExport)).toBeTrue();
                         return [2 /*return*/];
                 }
